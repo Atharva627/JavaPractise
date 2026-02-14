@@ -5,6 +5,7 @@
     "hashedPassword": "abc12345",
     "tickets_booked": [
       {
+        "ticket_id": "134",
         "source": "Banglore",
         "destination": "Delhi",
         "date_of_travel": "2025-12-08T18:30:00Z",
