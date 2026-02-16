@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class UserBookingService {
     private User user;
@@ -21,16 +22,22 @@ public class UserBookingService {
 
     private static final String USERS_PATH="app/src/main/java/ticket/booking/localDB/users.json";
 
+    public UserBookingService() throws IOException{
+        loadUser();
+    }
+
     public UserBookingService(User user) throws IOException {
         this.user = user;
+        loadUser();
+    }
+    public void loadUser() throws IOException{
         File users = new File(USERS_PATH);
         userList = objectMapper.readValue(users, new TypeReference<List<User>>() {
         });
     }
-
     public Boolean loginUser(){
         Optional<User> foundUser = userList.stream().filter(user1 -> {
-            return user1.getName().equals(user.getName()) && UserServiceUtil.checkPassword(user.getPassword(),user1.getHashedPassword());
+            return user1.getName().equalsIgnoreCase(user.getName()) && UserServiceUtil.checkPassword(user.getPassword(),user1.getHashedPassword());
         }).findFirst();
         return foundUser.isPresent();
 
@@ -58,8 +65,10 @@ public class UserBookingService {
     public Boolean cancelBooking(String ticketId){
         try {
             //todo: Complete this function
-
-
+            userTicketsList = user.getTicketsBooked();
+            userTicketsList = userTicketsList.stream().filter(e-> !(e.equals(ticketId))).collect(Collectors.toList());
+            user.setTicketsBooked(userTicketsList);
+            saveUserListToFile();
             return Boolean.TRUE;
         } catch (IOException ex) {
             return Boolean.FALSE;
